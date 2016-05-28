@@ -2,53 +2,52 @@ package com.jofa.match.service;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.deser.DataFormatReaders.Match;
-import com.jofa.match.dao.impl.MatchDaoImpl;
+import com.jofa.match.dao.impl.TicMatchDaoImpl;
+import com.jofa.match.model.TicMatch;
 
-public class MatchService {
+public class TicMatchService {
 
-	private static MatchDaoImpl matchDaoImpl;
+	private static TicMatchDaoImpl matchDaoImpl;
 
-	
-	public MatchService() {
-		matchDaoImpl = new MatchDaoImpl();
+	public TicMatchService() {
+		matchDaoImpl = new TicMatchDaoImpl();
 	}
 
-	public void persist(Match entity) {
+	public void persist(TicMatch entity) {
 		matchDaoImpl.openCurrentSessionwithTransaction();
 		matchDaoImpl.persist(entity);
 		matchDaoImpl.closeCurrentSessionwithTransaction();
 	}
-	
-	public void save(Match entity) {
+
+	public void save(TicMatch entity) {
 		matchDaoImpl.openCurrentSessionwithTransaction();
 		matchDaoImpl.save(entity);
 		matchDaoImpl.closeCurrentSessionwithTransaction();
 	}
 
-	public void update(Match entity) {
+	public void update(TicMatch entity) {
 		matchDaoImpl.openCurrentSessionwithTransaction();
 		matchDaoImpl.update(entity);
 		matchDaoImpl.closeCurrentSessionwithTransaction();
 	}
 
-	public Match findById(Integer id) {
+	public TicMatch findById(Integer id) {
 		matchDaoImpl.openCurrentSession();
-		Match book = matchDaoImpl.findById(id);
+		TicMatch book = matchDaoImpl.findById(id);
 		matchDaoImpl.closeCurrentSession();
 		return book;
 	}
 
 	public void delete(int id) {
 		matchDaoImpl.openCurrentSessionwithTransaction();
-		Match book = matchDaoImpl.findById(id);
+		TicMatch book = matchDaoImpl.findById(id);
 		matchDaoImpl.delete(book);
 		matchDaoImpl.closeCurrentSessionwithTransaction();
 	}
 
-	public List<Match> findAll() {
+	public List<TicMatch> findAll() {
 		matchDaoImpl.openCurrentSession();
-		List<Match> books = matchDaoImpl.findAll();
+		List<TicMatch> books = matchDaoImpl.findAll();
 		matchDaoImpl.closeCurrentSession();
 		return books;
 	}
@@ -59,12 +58,11 @@ public class MatchService {
 		matchDaoImpl.closeCurrentSessionwithTransaction();
 	}
 
-	public MatchDaoImpl matchDao() {
+	public TicMatchDaoImpl matchDao() {
 		return matchDaoImpl;
 	}
 
-	public void SaveOrUpdate(Match match) {
-		// TODO Auto-generated method stub
+	public void SaveOrUpdate(TicMatch match) {
 
 		matchDaoImpl.openCurrentSessionwithTransaction();
 		matchDaoImpl.saveOrUpdate(match);

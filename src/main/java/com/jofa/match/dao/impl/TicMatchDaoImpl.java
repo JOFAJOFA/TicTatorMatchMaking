@@ -1,4 +1,4 @@
-package com.jofa.elo.dao.impl;
+package com.jofa.match.dao.impl;
 
 import java.util.List;
 
@@ -10,17 +10,18 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 import org.springframework.stereotype.Repository;
 
-import com.jofa.elo.dao.EloDao;
-import com.jofa.elo.exception.EloNotSavedException;
-import com.jofa.elo.model.Elo;
+import com.jofa.match.dao.TicMatchDao;
+import com.jofa.match.exception.MatchNotSavedException;
+import com.jofa.match.model.TicMatch;
 
-@Repository("eloDao")
-public class EloDaoImpl implements EloDao<Elo, String> {
+
+@Repository("matchDao")
+public class TicMatchDaoImpl implements TicMatchDao<TicMatch, String> {
 
 	private Session currentSession;
     private Transaction currentTransaction;
     
-    public EloDaoImpl() {
+    public TicMatchDaoImpl() {
     }
 
     public Session openCurrentSession() {
@@ -67,36 +68,36 @@ public class EloDaoImpl implements EloDao<Elo, String> {
 	}
 	
 	@Override
-	public void persist(Elo entity) throws EloNotSavedException {
+	public void persist(TicMatch entity) throws MatchNotSavedException {
 		currentSession.persist(entity);
 	}
 	
 	@Override
-	public void saveOrUpdate(Elo entity){
+	public void saveOrUpdate(TicMatch entity){
 		currentSession.saveOrUpdate(entity);
 	}
 
 
 	@Override
-	public void update(Elo entity) {
+	public void update(TicMatch entity) {
 		currentSession.update(entity);
 		
 	}
 
 	@Override
-	public Elo findByUserName(String username) {
-		return (Elo)currentSession.get(Elo.class, username);
+	public TicMatch findById(Integer id) {
+		return (TicMatch)currentSession.get(TicMatch.class, id);
 	}
 
 	@Override
-	public void delete(Elo entity) {
+	public void delete(TicMatch entity) {
 		currentSession.delete(entity);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Elo> findAll() {
-		return currentSession.createCriteria(Elo.class).list();
+	public List<TicMatch> findAll() {
+		return currentSession.createCriteria(TicMatch.class).list();
 	}
 
 	@Override
@@ -106,8 +107,9 @@ public class EloDaoImpl implements EloDao<Elo, String> {
 	}
 
 	@Override
-	public void save(Elo entity) {
+	public void save(TicMatch entity) {
 		currentSession.save(entity);		
 	}
-	
+
+
 }

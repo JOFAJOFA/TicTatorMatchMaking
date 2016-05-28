@@ -1,4 +1,4 @@
-package com.jofa.match.dao.impl;
+package com.jofa.elo.dao.impl;
 
 import java.util.List;
 
@@ -7,21 +7,22 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Property;
 import org.hibernate.service.ServiceRegistry;
 import org.springframework.stereotype.Repository;
 
-import com.fasterxml.jackson.databind.deser.DataFormatReaders.Match;
-import com.jofa.match.dao.MatchDao;
+import com.jofa.elo.dao.UserEloDao;
+import com.jofa.elo.exception.EloNotSavedException;
+import com.jofa.elo.model.UserElo;
 
-import com.jofa.match.exception.MatchNotSavedException;
 
-@Repository("matchDao")
-public class MatchDaoImpl implements MatchDao<Match, String> {
+@Repository("eloDao")
+public class UserEloDaoImpl implements UserEloDao<UserElo, String> {
 
 	private Session currentSession;
     private Transaction currentTransaction;
     
-    public MatchDaoImpl() {
+    public UserEloDaoImpl() {
     }
 
     public Session openCurrentSession() {
@@ -68,36 +69,46 @@ public class MatchDaoImpl implements MatchDao<Match, String> {
 	}
 	
 	@Override
-	public void persist(Match entity) throws MatchNotSavedException {
-		currentSession.persist(entity);
+	public void persist(UserElo entity) throws EloNotSavedException {
+		currentSession.persist(entity);	
 	}
 	
 	@Override
-	public void saveOrUpdate(Match entity){
+	public void saveOrUpdate(UserElo entity){
 		currentSession.saveOrUpdate(entity);
 	}
 
 
 	@Override
-	public void update(Match entity) {
+	public void update(UserElo entity) {
 		currentSession.update(entity);
 		
 	}
-
+	
 	@Override
-	public Match findById(Integer id) {
-		return (Match)currentSession.get(Match.class, id);
+	public UserElo findById(Integer id) {
+		return (UserElo)currentSession.get(UserElo.class, id);
+	}
+	
+	@Override
+	public UserElo findByUserName(String username) {
+		@SuppressWarnings("unchecked")
+		List<UserElo> elo = currentSession.createCriteria(UserElo.class)
+			    .add(Property.forName("username").eq(username))
+			    .list();
+		return elo.isEmpty() ? null : elo.get(0);
 	}
 
+
 	@Override
-	public void delete(Match entity) {
+	public void delete(UserElo entity) {
 		currentSession.delete(entity);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Match> findAll() {
-		return currentSession.createCriteria(Match.class).list();
+	public List<UserElo> findAll() {
+		return currentSession.createCriteria(UserElo.class).list();
 	}
 
 	@Override
@@ -107,9 +118,8 @@ public class MatchDaoImpl implements MatchDao<Match, String> {
 	}
 
 	@Override
-	public void save(Match entity) {
+	public void save(UserElo entity) {
 		currentSession.save(entity);		
 	}
-
-
+	
 }

@@ -1,9 +1,11 @@
-package com.jofa.match.dao;
+package com.jofa.elo.dao;
 
 import java.io.Serializable;
 import java.util.List;
 
-public interface MatchDao <T, Id extends Serializable> {
+import com.jofa.elo.model.UserElo;
+
+public interface UserEloDao <T, Id extends Serializable> {
 
 	public void persist(T entity);
 	
@@ -11,7 +13,7 @@ public interface MatchDao <T, Id extends Serializable> {
 	
 	public void update(T entity);
 	
-	public T findById(Integer id);
+	public T findByUserName(String id);
 	
 	public void delete(T entity);
 	
@@ -19,6 +21,8 @@ public interface MatchDao <T, Id extends Serializable> {
 	
 	public void deleteAll();
 
-	public void saveOrUpdate(T entity);	
+	public void saveOrUpdate(T entity);
+
+	UserElo findById(Integer id);
 	
 }

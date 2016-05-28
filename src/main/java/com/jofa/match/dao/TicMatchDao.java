@@ -1,9 +1,9 @@
-package com.jofa.elo.dao;
+package com.jofa.match.dao;
 
 import java.io.Serializable;
 import java.util.List;
 
-public interface EloDao <T, Id extends Serializable> {
+public interface TicMatchDao <T, Id extends Serializable> {
 
 	public void persist(T entity);
 	
@@ -11,7 +11,7 @@ public interface EloDao <T, Id extends Serializable> {
 	
 	public void update(T entity);
 	
-	public T findByUserName(String id);
+	public T findById(Integer id);
 	
 	public void delete(T entity);
 	
@@ -19,6 +19,6 @@ public interface EloDao <T, Id extends Serializable> {
 	
 	public void deleteAll();
 
-	public void saveOrUpdate(T entity);
+	public void saveOrUpdate(T entity);	
 	
 }
