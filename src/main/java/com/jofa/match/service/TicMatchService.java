@@ -1,7 +1,14 @@
 package com.jofa.match.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
+
+import com.jofa.elo.model.UserElo;
 import com.jofa.match.dao.impl.TicMatchDaoImpl;
 import com.jofa.match.model.TicMatch;
 
@@ -37,6 +44,7 @@ public class TicMatchService {
 		matchDaoImpl.closeCurrentSession();
 		return book;
 	}
+	
 
 	public void delete(int id) {
 		matchDaoImpl.openCurrentSessionwithTransaction();
@@ -67,5 +75,24 @@ public class TicMatchService {
 		matchDaoImpl.openCurrentSessionwithTransaction();
 		matchDaoImpl.saveOrUpdate(match);
 		matchDaoImpl.closeCurrentSessionwithTransaction();
+	}
+
+	
+	//TEST  THIS WHEN FERENC IS READY
+	public void SendUserEloObjectsToGameService(String URL, UserElo userElo1, UserElo userElo2) {
+		// TODO Auto-generated method stub
+		ArrayList<UserElo> list = new ArrayList<UserElo>();
+		list.add(userElo1);
+		list.add(userElo2);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		
+		@SuppressWarnings("rawtypes")
+		HttpEntity<ArrayList> entity = new HttpEntity<ArrayList>(list, headers);
+		
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.postForEntity(URL,entity,  ArrayList.class);
+		System.out.println("PLAYERS HAVE BEENT SENT TO THE GAME SERVICE");
+		
 	}
 }

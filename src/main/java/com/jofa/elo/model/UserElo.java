@@ -31,6 +31,9 @@ public class UserElo implements java.io.Serializable {
 	private Set<TicMatch> matchesForLUsername = new HashSet<TicMatch>(0);
 	private Set<TicMatch> matchesForWUsername = new HashSet<TicMatch>(0);
 
+	
+	
+	
 	public UserElo() {
 	}
 	public UserElo(String username, int elo, int wins, int losses, int draws) {

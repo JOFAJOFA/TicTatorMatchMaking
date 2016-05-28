@@ -77,6 +77,13 @@ public class UserEloService {
 		eloDaoImpl.closeCurrentSessionwithTransaction();
 	}
 
+	public void updateDrawsForPlayer(UserElo player)
+	{
+		player.incrementDraws();
+		update(player);
+	}
+
+	
 	//constant for ELO calculation
 	static final int K = 32;
 	
@@ -98,12 +105,12 @@ public class UserEloService {
 		update(loser);
 	}
 
-	public int EloChange(int averageElo, int playerElo, boolean isVictory) {
+	private int EloChange(int averageElo, int playerElo, boolean isVictory) {
 		int res = (int) Math.round(ChanceToWin(averageElo, playerElo) * K);
 		return isVictory ? K - res : res;
 	}
 
-	public double ChanceToWin(int averageElo, int playerElo) {
+	private double ChanceToWin(int averageElo, int playerElo) {
 		return 1 / (1 + Math.pow(10.0, (averageElo - (double) playerElo) / 400));
 	}
 }
