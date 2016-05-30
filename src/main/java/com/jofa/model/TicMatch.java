@@ -1,4 +1,4 @@
-package com.jofa.match.model;
+package com.jofa.model;
 
 import java.util.Date;
 
@@ -15,28 +15,31 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.jofa.elo.model.UserElo;
+import com.jofa.model.UserElo;
 
 @XmlRootElement
 @Entity
 @Table(name = "tic_match", catalog = "db_match")
-public class TicMatch implements java.io.Serializable {
+public class TicMatch implements java.io.Serializable
+{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private Integer id;
 	private UserElo userEloByLUsername;
 	private UserElo userEloByWUsername;
 	private boolean draw;
 	private Date matchDate;
 
-	public TicMatch() {
+	public TicMatch()
+	{
 	}
 
-	public TicMatch(UserElo userEloByLUsername, UserElo userEloByWUsername, boolean draw, Date matchDate) {
+	public TicMatch(UserElo userEloByWUsername, UserElo userEloByLUsername, boolean draw, Date matchDate)
+	{
 		this.userEloByLUsername = userEloByLUsername;
 		this.userEloByWUsername = userEloByWUsername;
 		this.draw = draw;
@@ -46,58 +49,68 @@ public class TicMatch implements java.io.Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", unique = true, nullable = false)
-	public Integer getId() {
+	public Integer getId()
+	{
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Integer id)
+	{
 		this.id = id;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "l_username", nullable = false)
-	public UserElo getUserEloByLUsername() {
+	public UserElo getUserEloByLUsername()
+	{
 		return this.userEloByLUsername;
 	}
 
-	public void setUserEloByLUsername(UserElo userEloByLUsername) {
+	public void setUserEloByLUsername(UserElo userEloByLUsername)
+	{
 		this.userEloByLUsername = userEloByLUsername;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "w_username", nullable = false)
-	public UserElo getUserEloByWUsername() {
+	public UserElo getUserEloByWUsername()
+	{
 		return this.userEloByWUsername;
 	}
 
-	public void setUserEloByWUsername(UserElo userEloByWUsername) {
+	public void setUserEloByWUsername(UserElo userEloByWUsername)
+	{
 		this.userEloByWUsername = userEloByWUsername;
 	}
 
 	@Column(name = "draw", nullable = false)
-	public boolean isDraw() {
+	public boolean isDraw()
+	{
 		return this.draw;
 	}
 
-	public void setDraw(boolean draw) {
+	public void setDraw(boolean draw)
+	{
 		this.draw = draw;
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "match_date", /*nullable = false,*/ length = 19,columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP",insertable=false, updatable=false)
-	public Date getMatchDate() {
+	@Column(name = "match_date", /* nullable = false, */ length = 19, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", insertable = false, updatable = false)
+	public Date getMatchDate()
+	{
 		return this.matchDate;
 	}
 
-	public void setMatchDate(Date matchDate) {
+	public void setMatchDate(Date matchDate)
+	{
 		this.matchDate = matchDate;
 	}
-	
+
 	@Override
 	public String toString()
 	{
-		return "["+this.getId()+ " | " + this.getMatchDate()+ " | " + this.getUserEloByWUsername().getUsername()+ " | " + this.getUserEloByLUsername().getUsername()+" | " + this.draw+"]";
+		return "[" + this.getId() + " | " + this.getMatchDate() + " | " + this.getUserEloByWUsername().getUsername()
+				+ " | " + this.getUserEloByLUsername().getUsername() + " | " + this.draw + "]";
 	}
-	
-	
+
 }

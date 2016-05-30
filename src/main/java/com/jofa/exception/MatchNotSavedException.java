@@ -1,4 +1,4 @@
-package com.jofa.match.exception;
+package com.jofa.exception;
 
 public class MatchNotSavedException extends RuntimeException {
 

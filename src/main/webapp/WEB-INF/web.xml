@@ -26,10 +26,10 @@
 	    <filter-name>osiv-filter</filter-name>
 	    <filter-class>org.springframework.orm.hibernate4.support.OpenSessionInViewFilter</filter-class>
 	</filter>
-	
+	<!--  
 	<listener>
 		<listener-class>
                    org.springframework.web.context.ContextLoaderListener
                 </listener-class>
-	</listener>
+	</listener> -->
 </web-app>

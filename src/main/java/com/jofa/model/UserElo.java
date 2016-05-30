@@ -1,10 +1,10 @@
-package com.jofa.elo.model;
+package com.jofa.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import com.jofa.match.model.TicMatch;
+import com.jofa.model.TicMatch;
 
 import java.util.HashSet;
 import java.util.Set;

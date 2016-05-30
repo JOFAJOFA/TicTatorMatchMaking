@@ -4,7 +4,7 @@
  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-	<class name="com.jofa.elo.model.UserElo" table="user_elo"
+	<class name="com.jofa.model.UserElo" table="user_elo"
 		catalog="db_match" optimistic-lock="version">
 		<meta attribute="class-description">
 			This class contains the match details.
@@ -30,14 +30,14 @@
 			<key>
 				<column name="l_username" length="45" not-null="true" />
 			</key>
-			<one-to-many class="com.jofa.match.model.TicMatch" />
+			<one-to-many class="com.jofa.model.TicMatch" />
 		</set>
 		<set name="ticMatchesForWUsername" table="tic_match" inverse="true"
 			lazy="true" fetch="select">
 			<key>
 				<column name="w_username" length="45" not-null="true" />
 			</key>
-			<one-to-many class="com.jofa.match.model.TicMatch" />
+			<one-to-many class="com.jofa.model.TicMatch" />
 		</set>
 	</class>
 </hibernate-mapping>

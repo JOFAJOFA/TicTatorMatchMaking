@@ -1,4 +1,4 @@
-package com.jofa.elo.exception;
+package com.jofa.exception;
 
 public class EloNotSavedException extends RuntimeException {
 
