@@ -56,6 +56,7 @@ public abstract class GenericDaoImpl<T, Integer extends Serializable> implements
 		try
 		{
 			sessionFactory.getCurrentSession().beginTransaction();
+			@SuppressWarnings("unchecked")
 			T entity = (T) getSession().get(getPersistentClass(), id);
 			sessionFactory.getCurrentSession().getTransaction().commit();
 			return entity;
@@ -77,7 +78,10 @@ public abstract class GenericDaoImpl<T, Integer extends Serializable> implements
 	{
 		try
 		{
+			sessionFactory.getCurrentSession().beginTransaction();
 			getSession().update(entity);
+			sessionFactory.getCurrentSession().getTransaction().commit();
+			
 		} catch (HibernateException e)
 		{
 			LOG.error(e.toString());
@@ -105,7 +109,9 @@ public abstract class GenericDaoImpl<T, Integer extends Serializable> implements
 	{
 		try
 		{
+			sessionFactory.getCurrentSession().beginTransaction();
 			getSession().delete(entity);
+			sessionFactory.getCurrentSession().getTransaction().commit();
 		} catch (HibernateException e)
 		{
 			LOG.error(e.toString());
@@ -128,13 +134,14 @@ public abstract class GenericDaoImpl<T, Integer extends Serializable> implements
 	@SuppressWarnings("unchecked")
 	public List<T> findByCriteria(Criterion... criterion)
 	{
+		sessionFactory.getCurrentSession().beginTransaction();
 		Criteria crit = getSession().createCriteria(getPersistentClass());
 		crit.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		for (Criterion c : criterion)
 		{
 			crit.add(c);
 		}
-
+		sessionFactory.getCurrentSession().getTransaction().commit();
 		return crit.list();
 	}
 

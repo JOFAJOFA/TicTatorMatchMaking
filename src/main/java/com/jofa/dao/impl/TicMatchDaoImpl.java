@@ -17,6 +17,7 @@ public class TicMatchDaoImpl extends GenericDaoImpl<TicMatch, Integer> implement
 
 	
 	
+	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(TicMatchDaoImpl.class);
 
 	private SessionFactory sessionFactory;

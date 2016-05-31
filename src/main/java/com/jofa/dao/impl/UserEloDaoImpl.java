@@ -16,6 +16,7 @@ import com.jofa.model.UserElo;
 public class UserEloDaoImpl extends GenericDaoImpl<UserElo, Integer> implements UserEloDao
 {
 
+	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(UserEloDaoImpl.class);
 
 	private SessionFactory sessionFactory;
