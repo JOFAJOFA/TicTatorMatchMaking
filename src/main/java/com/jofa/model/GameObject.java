@@ -1,11 +1,22 @@
 package com.jofa.model;
 
+import javax.persistence.Entity;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@Entity
+@XmlRootElement
 public class GameObject
 {
 
 	private String gameID;
 	
 	private String IP;
+	
+	public GameObject()
+	{
+		super();
+	}
+	
 	
 	public GameObject(String gameID, String iP)
 	{

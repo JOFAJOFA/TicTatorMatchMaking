@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -47,10 +49,11 @@ public class MatchMakingController
 		ONILINE, LOOKINGFORGAME, INGAME
 	};
 
+	
 	private static final Logger log = Logger.getLogger(MatchMakingController.class.getName());
 
 	// Load balancer ip
-	private static final String LoadBalancer_URL = "http://146.185.163.158:8081/TicTatorGame-1.0-SNAPSHOT/addGame";
+	private static final String LoadBalancer_URL = "http://146.185.163.158:8081/TicTatorGame/addGame";
 
 	@Autowired
 	private TicMatchDao ticMatchDao;
@@ -58,7 +61,7 @@ public class MatchMakingController
 	private UserEloDao userEloDao;
 
 	private Map<String, STATES> onlineUsers = new HashMap<String, STATES>();
-	private ArrayList<UserElo> usersLFG = new ArrayList<UserElo>();
+	private Map<String, UserElo> usersLFG = new HashMap<String, UserElo>();
 
 	// match id, ip
 	private Map<String, String> matchIdsAndIPs = new HashMap<String, String>();
@@ -74,9 +77,9 @@ public class MatchMakingController
 	{
 		// 800 is the starting elo for every player
 		userEloDao.save(new UserElo(username, 800, 0, 0, 0));
+		// log.log(Level.INFO, "USER  HAS BEEN SAVED");
+
 		return new ResponseEntity(HttpStatus.OK);
-		
-		//TODO: 
 	}
 
 	// ------------------- CHANGE USER STATES ---------------------------
@@ -87,8 +90,8 @@ public class MatchMakingController
 	public ResponseEntity AddToOnlineUserList(@PathVariable String username)
 	{
 		onlineUsers.put(username, STATES.ONILINE);
-		
-		log.log(Level.INFO,"SET TO ONLINE:" + userEloDao.findByUserName(username).toString());
+
+		 log.log(Level.INFO, "SET TO ONLINE:" + userEloDao.findByUserName(username).toString());
 
 		return new ResponseEntity(HttpStatus.OK);
 	}
@@ -99,13 +102,13 @@ public class MatchMakingController
 	public ResponseEntity ChangeUserStateToTLFG(@PathVariable String username)
 	{
 
-		if (!usersLFG.contains(username) && onlineUsers.containsKey(username))
+		if (!usersLFG.containsKey(username) && onlineUsers.containsKey(username))
 		{
 			onlineUsers.put(username, STATES.LOOKINGFORGAME);
-			
-			usersLFG.add(userEloDao.findByUserName(username));
 
-			log.log(Level.INFO,"SET TO LFG:" + userEloDao.findByUserName(username).toString());
+			usersLFG.put(username, userEloDao.findByUserName(username));
+
+			 log.log(Level.INFO, "SET TO LFG:" + userEloDao.findByUserName(username).toString());
 		}
 
 		return new ResponseEntity(HttpStatus.OK);
@@ -115,6 +118,7 @@ public class MatchMakingController
 	public void ChangeUserStateToInGame(String username)
 	{
 		onlineUsers.put(username, STATES.INGAME);
+		 log.log(Level.INFO, username + "  SET TO IN GAME");
 	}
 
 	// remove players from online/userslfg lists
@@ -126,18 +130,65 @@ public class MatchMakingController
 		if (onlineUsers.containsKey(username))
 		{
 			onlineUsers.remove(username);
+			 log.log(Level.INFO, username + " REMOVED FROM ONLINE MAP");
 		}
 
-		if (usersLFG.contains(username))
+		if (usersLFG.containsKey(username))
 		{
 			usersLFG.remove(username);
+			 log.log(Level.INFO, username + " REMOVED FROM LFG LIST");
+		}
+
+		String matchId = playersAndmatchIds.get(username);
+		matchIdsAndIPs.remove(matchId);
+
+		List<String> keys = new ArrayList<String>(playersAndmatchIds.keySet());
+		for (String key : keys)
+		{
+
+			if (playersAndmatchIds.get(key) == matchId)
+			{
+				playersAndmatchIds.remove(key);
+			}
 		}
 
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/getInfo", method = RequestMethod.POST)
+	public void getInfo()
+	{
+
+		Iterator it = usersLFG.entrySet().iterator();
+		while (it.hasNext())
+		{
+			Map.Entry pair = (Map.Entry) it.next();
+			 log.log(Level.INFO, "userelo:  " + ((Map.Entry<String, UserElo>) it.next()).getValue());
+		}
+
+		
+		List<String> keys = new ArrayList<String>(onlineUsers.keySet());
+		for (String key : keys)
+		{
+			 log.log(Level.INFO, "userStateMAP :  " + onlineUsers.get(key));
+		}
+
+		keys = new ArrayList<String>(matchIdsAndIPs.keySet());
+		for (String key : keys)
+		{
+			 log.log(Level.INFO, "matchIdsAndIPs :  " + matchIdsAndIPs.get(key));
+		}
+
+		keys = new ArrayList<String>(playersAndmatchIds.keySet());
+		for (String key : keys)
+		{
+			 log.log(Level.INFO, "playersAndmatchIds :  " + playersAndmatchIds.get(key));
+		}
+	}
 	// --------------------- SCHEDULED JOB -> PAIRING OF USERS------------------
 
+	@SuppressWarnings("unchecked")
 	// pairs up two users to and forwards them to the sendUserToGameService
 	// method
 	@Scheduled(fixedRate = 5000)
@@ -145,43 +196,44 @@ public class MatchMakingController
 	{
 		if (usersLFG.size() > 1)
 		{
-			log.log(Level.INFO, "START OLD LIST --------------------------------------------------");
-			
+			// log.log(Level.INFO, "START OLD LIST --------------------------------------------------");
 
-			log.log(Level.INFO,"LFG LIST SIZE:" + usersLFG.size());
-			
-			for (UserElo userElo : usersLFG)
-			{
-				log.log(Level.INFO,"USERELOS");
-				log.log(Level.INFO, userElo.toString());
-				log.log(Level.INFO, userElo.getUsername());
-				log.log(Level.INFO,  userElo.getElo());
-			}
-			log.log(Level.INFO, "END OLD LIST --------------------------------------------------");
+			// log.log(Level.INFO, "LFG LIST SIZE:" + usersLFG.size());
 
-			for (int i = 0; i < usersLFG.size() - 1; i++)
+		/*	Iterator it = usersLFG.entrySet().iterator();
+			while (it.hasNext())
 			{
-				for (int j = 0; j < usersLFG.size(); j++)
+				
+				 log.log(Level.INFO, "userelo:  " + ((Map.Entry<String, UserElo>) it.next()).getValue());
+			}*/
+						
+			Iterator i = usersLFG.entrySet().iterator();
+			while (i.hasNext())
+			{
+				Map.Entry<String, UserElo> entry = (Map.Entry<String, UserElo>)i.next();
+				UserElo player1 = entry.getValue();
+				
+				
+				Iterator j = usersLFG.entrySet().iterator();
+				while(j.hasNext())
 				{
-					if (i != j)
+					Map.Entry<String, UserElo> entrySecond = (Map.Entry<String, UserElo>)j.next();
+					UserElo player2 = entrySecond.getValue();
+					
+					if (player1 != player2 && player1 != null && player2 != null)
 					{
-						if (Math.abs(usersLFG.get(i).getElo() - usersLFG.get(j).getElo()) < 100)
+						if (Math.abs(player1.getElo() - player2.getElo()) < 100)
 						{
-							UserElo player1 = usersLFG.get(i);
-							UserElo player2 = usersLFG.get(j);
-
 							try
 							{
-								SendUserNamesToGameService(LoadBalancer_URL, player1.getUsername(),
-										player2.getUsername());
+								SendUserNamesToGameService(LoadBalancer_URL, player1.getUsername(),player2.getUsername());
 
 								ChangeUserStateToInGame(player1.getUsername());
 								ChangeUserStateToInGame(player2.getUsername());
 
-								usersLFG.remove(player1);
-								usersLFG.remove(player2);
-
-								i = i - 2 < 0 ? 0 : i - 2;
+								usersLFG.put(entry.getKey(), null);
+								usersLFG.put(entrySecond.getKey(), null);
+								
 								break;
 
 							} catch (HttpClientErrorException ex)
@@ -192,14 +244,37 @@ public class MatchMakingController
 					}
 				}
 			}
-
-			log.log(Level.INFO, "START NEW LIST --------------------------------------------------");
-			for (UserElo userElo : usersLFG)
+			
+			ArrayList<String> keys = new ArrayList<String>();
+			
+			Iterator itn = usersLFG.entrySet().iterator();
+			while (itn.hasNext())
 			{
-				log.log(Level.INFO, userElo.getUsername() + " : " + userElo.getElo());
+				Map.Entry<String,UserElo> pair = (Map.Entry<String,UserElo>) itn.next();
+				
+				if(pair.getValue() == null)
+				{
+					keys.add(pair.getKey());
+				}
 			}
-			log.log(Level.INFO, "END NEW LIST --------------------------------------------------");
+			
+			for (String key : keys)
+			{
+				usersLFG.remove(key);
+			}
+		
+			usersLFG.remove(null);
 
+			// log.log(Level.INFO, "START NEW LIST --------------------------------------------------");
+			// log.log(Level.INFO, "LFG LIST SIZE:" + usersLFG.size());
+
+			/*Iterator id = usersLFG.entrySet().iterator();
+			while (it.hasNext())
+			{
+				Map.Entry pair = (Map.Entry) id.next();
+				// log.log(Level.INFO, "userelo:  " + ((Map.Entry<String, UserElo>) id.next()).getValue());
+			}	*/		
+			// log.log(Level.INFO, "END NEW LIST --------------------------------------------------");
 		}
 	}
 
@@ -220,20 +295,25 @@ public class MatchMakingController
 
 			HttpEntity<String> entity = new HttpEntity<String>(simpleJson.toJSONString(), headers);
 
-			log.log(Level.INFO, simpleJson.toJSONString());
+			 log.log(Level.INFO, simpleJson.toJSONString());
 
 			RestTemplate restTemplate = new RestTemplate();
-
-			restTemplate.postForEntity(URL, entity, String.class);
 
 			playersAndmatchIds.put(player1, gameId.toString());
 			playersAndmatchIds.put(player2, gameId.toString());
 
+			 log.log(Level.INFO, playersAndmatchIds.values());
+
 			matchIdsAndIPs.put(gameId.toString(), null);
+
+			// log.log(Level.INFO, matchIdsAndIPs.values());
+
+			restTemplate.postForEntity(URL, entity, String.class);
 
 			System.out.println("PLAYERS HAVE BEENT SENT TO THE GAME SERVICE");
 		} catch (HttpClientErrorException ex)
 		{
+
 			System.out.println("FAILED TO CONNECT REASON : ");
 			System.out.println(ex.toString());
 		}
@@ -244,7 +324,7 @@ public class MatchMakingController
 	// Ajax method to check if we have an ip
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "/getGame/{username}", method = RequestMethod.GET)
-	public ResponseEntity getGame(@PathVariable String username)
+	public ResponseEntity<GameObject> getGame(@PathVariable String username)
 	{
 		if (playersAndmatchIds.get(username) != null && onlineUsers.containsKey(username))
 		{
@@ -253,9 +333,9 @@ public class MatchMakingController
 				GameObject gO = new GameObject(playersAndmatchIds.get(username),
 						matchIdsAndIPs.get(playersAndmatchIds.get(username)));
 
-				log.log(Level.INFO, "COTROLLER RECEIVED  MATCH ID: " + gO.getGameID() + "  IP:" + gO.getIP());
+				 log.log(Level.INFO, "COTROLLER RECEIVED  MATCH ID: " + gO.getGameID() + "  IP:" + gO.getIP());
 
-				return new ResponseEntity<>(gO, HttpStatus.OK);
+				return new ResponseEntity<GameObject>(gO, HttpStatus.OK);
 			}
 		}
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -275,11 +355,10 @@ public class MatchMakingController
 	}
 
 	@SuppressWarnings("rawtypes")
-	@RequestMapping(value = "/setIP/{gameID}", method = RequestMethod.POST)
+	@RequestMapping(value = "/setIp/{gameID}", method = RequestMethod.POST)
 	public ResponseEntity setIP(HttpServletRequest request, @PathVariable String gameID)
 	{
-		log.log(Level.INFO, "IP RECEIVED FROM GS: ");
-		log.log(Level.INFO, "GAME ID: " + gameID + "    IP: " + request.getRemoteAddr().toString());
+		 log.log(Level.INFO, "IP RECEIVED FROM GS: "+"GAME ID: " + gameID + "    IP: " + request.getRemoteAddr().toString());
 
 		if (matchIdsAndIPs.containsKey(gameID))
 		{
@@ -297,50 +376,58 @@ public class MatchMakingController
 	@RequestMapping(value = "/gameResult", method = RequestMethod.POST)
 	public ResponseEntity gameResult(HttpServletRequest request) throws IOException, ParseException
 	{
-		
+
 		BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-        String sCurrentLine;
-        String jsonString = "";
-        while ((sCurrentLine = br.readLine()) != null) 
-        {        	
-        	jsonString += sCurrentLine;
-        }
-		
-        JSONObject json = (JSONObject)new JSONParser().parse(jsonString);
-        
+		String sCurrentLine;
+		String jsonString = "";
+		while ((sCurrentLine = br.readLine()) != null)
+		{
+			jsonString += sCurrentLine;
+		}
+
+		JSONObject json = (JSONObject) new JSONParser().parse(jsonString);
+
 		UserElo winner = new UserElo(), loser = new UserElo();
 		boolean draw = false;
 
-		switch ( json.get("result").toString())
+		switch (json.get("result").toString())
 		{
 		case "draw":
 			draw = true;
 			winner = userEloDao.findByUserName(json.get("player1").toString());
 			loser = userEloDao.findByUserName(json.get("player2").toString());
-			
-			 log.log(Level.INFO, json.toString()); 
+
 			break;
 		case "playerX":
 			winner = userEloDao.findByUserName(json.get("player1").toString());
 			loser = userEloDao.findByUserName(json.get("player2").toString());
-			
-			 log.log(Level.INFO, json.toString()); 
+
 			break;
 		case "playerO":
 			loser = userEloDao.findByUserName(json.get("player1").toString());
 			winner = userEloDao.findByUserName(json.get("player2").toString());
-			
-			 log.log(Level.INFO, json.toString()); 
+
 			break;
-		default: log.log(Level.INFO, json.toString()); break;
+		default:
+			break;
 		}
 
-		log.log(Level.INFO,"loser: " +  loser.toString());
-		log.log(Level.INFO, "WINNER: " +winner.toString());
+		 log.log(Level.INFO, "loser: " + loser.toString());
+		 log.log(Level.INFO, "WINNER: " + winner.toString());
 
 		updateUsers(winner, loser, draw);
-		
-		
+
+		String player1 = json.get("player1").toString();
+		String player2 = json.get("player2").toString();
+
+		String matchId = playersAndmatchIds.get(json.get("player2").toString());
+
+		matchIdsAndIPs.remove(matchId);
+		playersAndmatchIds.remove(player1);
+		playersAndmatchIds.remove(player2);
+
+		onlineUsers.put(player1, STATES.ONILINE);
+		onlineUsers.put(player2, STATES.ONILINE);
 
 		return new ResponseEntity(HttpStatus.OK);
 	}
@@ -349,16 +436,15 @@ public class MatchMakingController
 	{
 		onlineUsers.put(winner.getUsername(), STATES.ONILINE);
 		onlineUsers.put(loser.getUsername(), STATES.ONILINE);
-		
-		//log.log(Level.INFO, "USERS CHANGED BACK TO ONLINE");
 
+		 log.log(Level.INFO, "USERS CHANGED BACK TO ONLINE");
 
 		if (draw)
 		{
 			updateDrawsForPlayer(winner);
 			updateDrawsForPlayer(loser);
-			
-			//log.log(Level.INFO, "DRAWS UPDATED IN DB");
+
+			 log.log(Level.INFO, "DRAWS UPDATED IN DB");
 
 		} else
 		{
@@ -366,9 +452,9 @@ public class MatchMakingController
 		}
 
 		TicMatch match = new TicMatch(winner, loser, draw, null);
-		
-		log.log(Level.INFO,match.toString());
-		
+
+		 log.log(Level.INFO, match.toString());
+
 		ticMatchDao.save(match);
 	}
 
