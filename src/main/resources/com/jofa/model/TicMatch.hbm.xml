@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.jofa.model.TicMatch" table="tic_match"
+		catalog="db_match" optimistic-lock="version">
+		<id name="id" type="java.lang.Integer">
+			<column name="id" sql-type="INT(10) unique" />
+			<generator class="identity" />
+		</id>
+		<many-to-one name="userEloByLUsername" class="com.jofa.model.UserElo"
+			fetch="select">
+			<column name="l_username" length="45" not-null="true" />
+		</many-to-one>
+		<many-to-one name="userEloByWUsername" class="com.jofa.model.UserElo"
+			fetch="select">
+			<column name="w_username" length="45" not-null="true" />
+		</many-to-one>
+		<property name="draw" type="boolean">
+			<column name="draw" not-null="true" />
+		</property>
+		<property name="matchDate" type="timestamp"> <!-- not-null="true" -->
+			<column name="matchDate" sql-type="TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+				length="19" />
+		</property>
+
+	</class>
+</hibernate-mapping>
+

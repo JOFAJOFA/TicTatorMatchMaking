@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.jofa.model.UserElo" table="user_elo"
+		catalog="db_match" optimistic-lock="version">
+		<meta attribute="class-description">
+			This class contains the match details.
+		</meta>
+		<id name="username" type="string">
+			<column name="username" length="45" sql-type="VARCHAR(45) unique" />
+			<generator class="assigned" />
+		</id>
+		<property name="elo" type="int">
+			<column name="elo" not-null="true" />
+		</property>
+		<property name="wins" type="int">
+			<column name="wins" not-null="true" />
+		</property>
+		<property name="losses" type="int">
+			<column name="losses" not-null="true" />
+		</property>
+		<property name="draws" type="int">
+			<column name="draws" not-null="true" />
+		</property>
+		<set name="ticMatchesForLUsername" table="tic_match" inverse="true"
+			lazy="true" fetch="select">
+			<key>
+				<column name="l_username" length="45" not-null="true" />
+			</key>
+			<one-to-many class="com.jofa.model.TicMatch" />
+		</set>
+		<set name="ticMatchesForWUsername" table="tic_match" inverse="true"
+			lazy="true" fetch="select">
+			<key>
+				<column name="w_username" length="45" not-null="true" />
+			</key>
+			<one-to-many class="com.jofa.model.TicMatch" />
+		</set>
+	</class>
+</hibernate-mapping>

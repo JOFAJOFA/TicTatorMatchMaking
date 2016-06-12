@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.jofa</groupId>
-  <artifactId>TicTatorMatchMaking</artifactId>
-  <packaging>war</packaging>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>TicTatorMatchMaking Maven Webapp</name>
-  <url>http://maven.apache.org</url>
-  <!-- PROPERTIES -->
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.jofa</groupId>
+	<artifactId>TicTatorMatchMaking</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>TicTatorMatchMaking Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+	<!-- PROPERTIES -->
 	<properties>
 		<jdk.version>1.8</jdk.version>
 		<spring.version>4.2.6.RELEASE</spring.version>
@@ -19,6 +19,7 @@
 		<oauth.version>2.0.9.RELEASE</oauth.version>
 		<jackson.version>2.7.4</jackson.version>
 		<tiles.version>3.0.5</tiles.version>
+		<quartz.version>2.2.3</quartz.version>
 	</properties>
 
 	<repositories>
@@ -30,7 +31,12 @@
 
 	<dependencies>
 
-	
+		<!-- http://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 
 		<!-- FasterXML Jackson Core -->
 		<dependency>
@@ -54,6 +60,14 @@
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
 		</dependency>
+
+		<!-- http://mvnrepository.com/artifact/org.apache.tomcat/tomcat-jdbc -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>8.5.2</version>
+		</dependency>
+
 
 		<!-- Spring Core -->
 		<dependency>
@@ -97,8 +111,20 @@
 			<artifactId>spring-orm</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
-		
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+
 		<!-- MySQL database driver -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -110,9 +136,9 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
-			<version>5.1.0.Final</version>
+			<version>4.3.11.Final</version>
 		</dependency>
-		
+
 
 		<!-- jstl -->
 		<dependency>
@@ -176,12 +202,12 @@
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<path>/TicTatorController</path>
+					<path>/TicTatorMatchMaking</path>
 				</configuration>
 			</plugin>
 
 		</plugins>
-	
-    <finalName>TicTatorMatchMaking</finalName>
-  </build>
+
+		<finalName>TicTatorMatchMaking</finalName>
+	</build>
 </project>
