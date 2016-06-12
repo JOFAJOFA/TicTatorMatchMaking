@@ -91,7 +91,7 @@ public class MatchMakingController
 	{
 		onlineUsers.put(username, STATES.ONILINE);
 
-		 log.log(Level.INFO, "SET TO ONLINE:" + userEloDao.findByUserName(username).toString());
+		 log.log(Level.INFO, " ONLINE:" + userEloDao.findByUserName(username).getUsername().toString());
 
 		return new ResponseEntity(HttpStatus.OK);
 	}
@@ -108,7 +108,7 @@ public class MatchMakingController
 
 			usersLFG.put(username, userEloDao.findByUserName(username));
 
-			 log.log(Level.INFO, "SET TO LFG:" + userEloDao.findByUserName(username).toString());
+			 log.log(Level.INFO, "SET TO LFG:" + userEloDao.findByUserName(username).getUsername().toString());
 		}
 
 		return new ResponseEntity(HttpStatus.OK);
@@ -163,27 +163,26 @@ public class MatchMakingController
 		Iterator it = usersLFG.entrySet().iterator();
 		while (it.hasNext())
 		{
-			Map.Entry pair = (Map.Entry) it.next();
-			 log.log(Level.INFO, "userelo:  " + ((Map.Entry<String, UserElo>) it.next()).getValue());
+			 log.log(Level.INFO, "userelo:  " + ((Map.Entry<String, UserElo>) it.next()).getValue().getUsername());
 		}
 
 		
 		List<String> keys = new ArrayList<String>(onlineUsers.keySet());
 		for (String key : keys)
 		{
-			 log.log(Level.INFO, "userStateMAP :  " + onlineUsers.get(key));
+			 log.log(Level.INFO, "onlineUsers :  " + key + "   "  + onlineUsers.get(key));
 		}
 
 		keys = new ArrayList<String>(matchIdsAndIPs.keySet());
 		for (String key : keys)
 		{
-			 log.log(Level.INFO, "matchIdsAndIPs :  " + matchIdsAndIPs.get(key));
+			 log.log(Level.INFO, "matchIdsAndIPs :  "  + key + "   "  +  matchIdsAndIPs.get(key));
 		}
 
 		keys = new ArrayList<String>(playersAndmatchIds.keySet());
 		for (String key : keys)
 		{
-			 log.log(Level.INFO, "playersAndmatchIds :  " + playersAndmatchIds.get(key));
+			 log.log(Level.INFO, "playersAndmatchIds :  "  + key + "   "  + playersAndmatchIds.get(key));
 		}
 	}
 	// --------------------- SCHEDULED JOB -> PAIRING OF USERS------------------

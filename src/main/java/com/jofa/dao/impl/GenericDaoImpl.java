@@ -59,6 +59,8 @@ public abstract class GenericDaoImpl<T, Integer extends Serializable> implements
 			@SuppressWarnings("unchecked")
 			T entity = (T) getSession().get(getPersistentClass(), id);
 			sessionFactory.getCurrentSession().getTransaction().commit();
+			
+			
 			return entity;
 		} catch (HibernateException e)
 		{
